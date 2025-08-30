@@ -1,0 +1,38 @@
+@page "/play/{id:int}"
+
+@inject APICaller Api
+@inject NavigationManager Navigation
+
+<h1>Play Movie</h1>
+
+@if (movie == null)
+{
+    <p>Loading movie...</p>
+}
+else
+{
+    <h2>@movie.Title (@movie.Year)</h2>
+    <p>Enjoy your film!</p>
+    <button class="btn btn-primary" @onclick="MarkAsWatched">Finished watching</button>
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private Movie? movie;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        movie = await Api.GetMovieDetailsAsync(id);
+    }
+
+    private async Task MarkAsWatched()
+    {
+        if (movie != null)
+        {
+            await Api.AddOrUpdateWatchlistAsync(movie.Id, "Watched");
+            Navigation.NavigateTo("/");
+        }
+    }
+}

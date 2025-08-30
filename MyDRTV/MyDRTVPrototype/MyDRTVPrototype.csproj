@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <!-- Target .NET 6, adjust if a later version is available on your machine -->
+    <!-- Use a framework that is installed on the target machine.  net8.0 was chosen
+         because .NET 8.0.18 is available on your system (you can check installed
+         runtimes by running 'dotnet list runtimes' from the command line). -->
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- These packages provide Blazor Server capabilities -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Mark the JSON data file as content so that it is copied to the output -->
+    <Content Include="Data/data.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

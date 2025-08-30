@@ -1,0 +1,137 @@
+@page "/movies/{id:int}"
+
+@inject APICaller Api
+
+<h1>Movie Details</h1>
+
+@if (movie == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h2>@movie.Title (@movie.Year)</h2>
+    <p><strong>Genre:</strong> @movie.Genre</p>
+    <p><strong>Average rating:</strong> @avgRating.ToString("0.0")/5</p>
+
+    <div class="mb-3">
+        <label>Rate this movie:</label>
+        <select class="form-select" @bind="newRating">
+            <option value="0">Select rating</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <button class="btn btn-sm btn-primary mt-2" @onclick="SubmitRating" disabled="@(newRating < 1)">Submit rating</button>
+    </div>
+
+    <div class="mb-3">
+        <label>Add a comment:</label>
+    <textarea class="form-control" @bind-value="newComment" @bind-value:event="oninput" rows="3"></textarea>
+        <!-- Disable the submit button only when the comment is empty -->
+        <button class="btn btn-sm btn-secondary mt-2" @onclick="SubmitComment" disabled="@string.IsNullOrWhiteSpace(newComment)">Submit comment</button>
+    </div>
+
+    <div class="mb-3">
+        <label>Watchlist status:</label>
+        <select class="form-select" @bind="selectedState">
+            <option value="Watchlist">Watchlist (se senere)</option>
+            <option value="InProgress">Igangværende</option>
+            <option value="Watched">Allerede set</option>
+        </select>
+        <button class="btn btn-sm btn-info mt-2" @onclick="UpdateWatchStatus">Update status</button>
+    </div>
+
+    <div class="mb-3">
+        <button class="btn btn-sm btn-success" @onclick="PlayMovie">Play</button>
+    </div>
+
+    <div class="section-title">Comments</div>
+    @if (comments.Count == 0)
+    {
+        <p>No comments yet.</p>
+    }
+    else
+    {
+        @foreach (var c in comments)
+        {
+            <div class="movie-card">
+                <strong>User @c.UserId</strong> (@c.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm")):
+                <p>@c.Content</p>
+            </div>
+        }
+    }
+}
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+
+    private Movie? movie;
+    private List<Comment> comments = new();
+    private double avgRating;
+    private int newRating;
+    private string newComment = string.Empty;
+    private string selectedState = "Watchlist";
+
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        movie = await Api.GetMovieDetailsAsync(id);
+        if (movie != null)
+        {
+            avgRating = await Api.GetAverageRatingAsync(movie.Id);
+            comments = await Api.GetCommentsAsync(movie.Id);
+        }
+    }
+
+    private async Task SubmitRating()
+    {
+        if (newRating > 0 && movie != null)
+        {
+            await Api.AddRatingAsync(movie.Id, newRating);
+            // refresh average rating
+            avgRating = await Api.GetAverageRatingAsync(movie.Id);
+            newRating = 0;
+        }
+    }
+
+    private async Task SubmitComment()
+    {
+        if (!string.IsNullOrWhiteSpace(newComment) && movie != null)
+        {
+            await Api.AddCommentAsync(movie.Id, newComment.Trim());
+            newComment = string.Empty;
+            comments = await Api.GetCommentsAsync(movie.Id);
+        }
+    }
+
+    private async Task UpdateWatchStatus()
+    {
+        if (movie != null)
+        {
+            await Api.AddOrUpdateWatchlistAsync(movie.Id, selectedState);
+        }
+    }
+
+    private async Task PlayMovie()
+    {
+        if (movie != null)
+        {
+            // Add the movie to InProgress and Watched lists
+            await Api.AddOrUpdateWatchlistAsync(movie.Id, "InProgress");
+            await Api.AddOrUpdateWatchlistAsync(movie.Id, "Watched");
+            // Navigate to the play page
+            Navigation.NavigateTo($"/play/{movie.Id}");
+        }
+    }
+}

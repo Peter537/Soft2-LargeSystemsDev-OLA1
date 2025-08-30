@@ -1,0 +1,54 @@
+/* Basic styling for the prototype.  Feel free to adjust colours and spacing. */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+.sidebar {
+    width: 200px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    background-color: #343a40;
+    color: #fff;
+}
+
+.nav-link {
+    color: #ddd;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    display: block;
+}
+
+.nav-link:hover {
+    color: #fff;
+}
+
+.main {
+    margin-left: 220px;
+    padding: 1rem;
+}
+
+.movie-card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #fff;
+}
+
+.section-title {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* Buttons */
+button {
+    margin-right: 0.5rem;
+}

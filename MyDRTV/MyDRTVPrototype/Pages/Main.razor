@@ -1,0 +1,94 @@
+@page "/"
+
+@inject APICaller Api
+
+<h1>MyDRTV</h1>
+
+<div class="section-title">Igangværende film</div>
+@if (inProgress.Count == 0)
+{
+    <p>Ingen film i gang.</p>
+}
+else
+{
+    @foreach (var movie in inProgress)
+    {
+        <div class="movie-card">
+            <a href="@($"/movies/{movie.Id}")">@movie.Title</a> (@movie.Year)
+        </div>
+    }
+}
+
+<div class="section-title">Allerede set</div>
+@if (watched.Count == 0)
+{
+    <p>Ingen film set.</p>
+}
+else
+{
+    @foreach (var movie in watched)
+    {
+        <div class="movie-card">
+            <a href="@($"/movies/{movie.Id}")">@movie.Title</a> (@movie.Year)
+        </div>
+    }
+}
+
+<div class="section-title">Watchlist (se senere)</div>
+@if (watchlist.Count == 0)
+{
+    <p>Ingen film på watchlisten.</p>
+}
+else
+{
+    @foreach (var movie in watchlist)
+    {
+        <div class="movie-card">
+            <a href="@($"/movies/{movie.Id}")">@movie.Title</a> (@movie.Year)
+        </div>
+    }
+}
+
+<div class="section-title">Movies you may like</div>
+@if (recommendations.Count == 0)
+{
+    <p>Ingen anbefalinger tilgængelige.</p>
+}
+else
+{
+    @foreach (var movie in recommendations)
+    {
+        <div class="movie-card">
+            <a href="@($"/movies/{movie.Id}")">@movie.Title</a> (@movie.Year)
+        </div>
+    }
+}
+
+@code {
+    private List<Movie> inProgress = new();
+    private List<Movie> watched = new();
+    private List<Movie> watchlist = new();
+    private List<Movie> recommendations = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var allMovies = await Api.GetAllMoviesAsync();
+
+        // Fetch watchlist entries for each category
+        var inProgressEntries = await Api.GetWatchlistAsync("InProgress");
+        var watchedEntries = await Api.GetWatchlistAsync("Watched");
+        var watchlistEntries = await Api.GetWatchlistAsync("Watchlist");
+
+        inProgress = allMovies.Where(m => inProgressEntries.Any(e => e.MovieId == m.Id)).ToList();
+        watched    = allMovies.Where(m => watchedEntries.Any(e => e.MovieId == m.Id)).ToList();
+        watchlist  = allMovies.Where(m => watchlistEntries.Any(e => e.MovieId == m.Id)).ToList();
+
+        // Recommendations: pick random movies not in any list
+        var excludedIds = new HashSet<int>(inProgress.Select(m => m.Id)
+            .Concat(watched.Select(m => m.Id))
+            .Concat(watchlist.Select(m => m.Id)));
+        var remaining = allMovies.Where(m => !excludedIds.Contains(m.Id)).ToList();
+        var rng = new Random();
+        recommendations = remaining.OrderBy(_ => rng.Next()).Take(3).ToList();
+    }
+}

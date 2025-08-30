@@ -1,0 +1,58 @@
+{
+  "Movies": [
+    {
+      "Id": 1,
+      "Title": "The Olsen Gang",
+      "Year": 1968,
+      "Genre": "Comedy",
+      "AverageRating": 0.0
+    },
+    {
+      "Id": 2,
+      "Title": "Matador",
+      "Year": 1978,
+      "Genre": "Drama",
+      "AverageRating": 0.0
+    },
+    {
+      "Id": 3,
+      "Title": "Babettes Gæstebud",
+      "Year": 1987,
+      "Genre": "Drama",
+      "AverageRating": 0.0
+    },
+    {
+      "Id": 4,
+      "Title": "Tinka",
+      "Year": 2002,
+      "Genre": "Family",
+      "AverageRating": 0.0
+    },
+    {
+      "Id": 5,
+      "Title": "Klovn: The Movie",
+      "Year": 2010,
+      "Genre": "Comedy",
+      "AverageRating": 0.0
+    }
+  ],
+  "Users": [
+    {
+      "Id": 1,
+      "FirstName": "Kasper",
+      "LastName": "Hansen",
+      "UserName": "kasper123",
+      "BirthDate": "2000-01-01",
+      "Address": "Buddinge, Denmark",
+      "Anonymous": false,
+      "FavoriteGenre": "Comedy"
+    }
+  ],
+  "Ratings": [],
+  "Comments": [],
+  "WatchlistEntries": [
+    { "Id": 1, "UserId": 1, "MovieId": 2, "State": "Watched" },
+    { "Id": 2, "UserId": 1, "MovieId": 3, "State": "InProgress" },
+    { "Id": 3, "UserId": 1, "MovieId": 4, "State": "Watchlist" }
+  ]
+}

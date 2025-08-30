@@ -1,0 +1,43 @@
+@page "/movies"
+
+@inject APICaller Api
+
+<h1>All Movies</h1>
+
+<div class="mb-3">
+    <input type="text" class="form-control" placeholder="Search by title..." value="@searchText" @oninput="SearchChanged" />
+</div>
+
+@if (movies == null)
+{
+    <p>Loading movies...</p>
+}
+else if (movies.Count == 0)
+{
+    <p>No movies found.</p>
+}
+else
+{
+    @foreach (var movie in movies)
+    {
+        <div class="movie-card">
+            <a href="@($"/movies/{movie.Id}")">@movie.Title</a> (@movie.Year) – @movie.Genre
+        </div>
+    }
+}
+
+@code {
+    private List<Movie>? movies;
+    private string searchText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        movies = await Api.GetAllMoviesAsync();
+    }
+
+    private async Task SearchChanged(ChangeEventArgs e)
+    {
+        searchText = e.Value?.ToString() ?? string.Empty;
+        movies = await Api.SearchMoviesAsync(searchText);
+    }
+}

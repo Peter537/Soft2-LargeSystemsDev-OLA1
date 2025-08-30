@@ -1,0 +1,150 @@
+@page "/user"
+
+@inject APICaller Api
+
+<h1>User Profile</h1>
+
+@if (user == null)
+{
+    <p>Loading user information...</p>
+}
+else
+{
+    <EditForm Model="user" OnValidSubmit="SaveUser">
+        <div class="mb-3">
+            <label>First name:</label>
+            <!-- Use default onchange binding for InputText; the value is updated when the field loses focus -->
+            <InputText class="form-control" @bind-Value="user.FirstName" />
+        </div>
+        <div class="mb-3">
+            <label>Last name:</label>
+            <InputText class="form-control" @bind-Value="user.LastName" />
+        </div>
+        <div class="mb-3">
+            <label>Username:</label>
+            <InputText class="form-control" @bind-Value="user.UserName" />
+        </div>
+        <div class="mb-3">
+            <label>Birth date:</label>
+            <InputDate class="form-control" @bind-Value="user.BirthDate" />
+        </div>
+        <div class="mb-3">
+            <label>Address:</label>
+            <InputText class="form-control" @bind-Value="user.Address" />
+        </div>
+        <div class="mb-3">
+            <label>Anonymous:</label>
+            <InputCheckbox class="form-check-input" @bind-Value="user.Anonymous" />
+        </div>
+        <div class="mb-3">
+            <label>Favorite genre:</label>
+            <InputText class="form-control" @bind-Value="user.FavoriteGenre" />
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </EditForm>
+
+    <div class="section-title">Given Ratings</div>
+    @if (givenRatings.Count == 0)
+    {
+        <p>No ratings yet.</p>
+    }
+    else
+    {
+        @foreach (var item in givenRatings)
+        {
+            <div class="movie-card">
+                <a href="@($"/movies/{item.Movie.Id}")">@item.Movie.Title</a> (@item.Movie.Year) – @item.Rating.Value/5
+            </div>
+        }
+    }
+
+    <div class="section-title">Watchlist (se senere)</div>
+    @if (watchlist.Count == 0)
+    {
+        <p>No movies in watchlist.</p>
+    }
+    else
+    {
+        @foreach (var movie in watchlist)
+        {
+            <div class="movie-card">
+                <a href="@($"/movies/{movie.Id}")">@movie.Title</a> (@movie.Year)
+            </div>
+        }
+    }
+
+    <div class="section-title">Igangværende film</div>
+    @if (inProgress.Count == 0)
+    {
+        <p>No movies in progress.</p>
+    }
+    else
+    {
+        @foreach (var movie in inProgress)
+        {
+            <div class="movie-card">
+                <a href="@($"/movies/{movie.Id}")">@movie.Title</a> (@movie.Year)
+            </div>
+        }
+    }
+
+    <div class="section-title">Allerede set</div>
+    @if (watched.Count == 0)
+    {
+        <p>No movies watched.</p>
+    }
+    else
+    {
+        @foreach (var movie in watched)
+        {
+            <div class="movie-card">
+                <a href="@($"/movies/{movie.Id}")">@movie.Title</a> (@movie.Year)
+            </div>
+        }
+    }
+}
+
+@code {
+    private AppUser? user;
+    private List<Movie> watchlist = new();
+    private List<Movie> inProgress = new();
+    private List<Movie> watched = new();
+    private List<(Movie Movie, Rating Rating)> givenRatings = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await Api.GetCurrentUserAsync();
+        var allMovies = await Api.GetAllMoviesAsync();
+
+        // Load watchlist sections
+        var watchEntries  = await Api.GetWatchlistAsync("Watchlist");
+        var inProgEntries = await Api.GetWatchlistAsync("InProgress");
+        var watchedEntries = await Api.GetWatchlistAsync("Watched");
+        watchlist = allMovies.Where(m => watchEntries.Any(e => e.MovieId == m.Id)).ToList();
+        inProgress = allMovies.Where(m => inProgEntries.Any(e => e.MovieId == m.Id)).ToList();
+        watched = allMovies.Where(m => watchedEntries.Any(e => e.MovieId == m.Id)).ToList();
+
+        // Load ratings given by user
+        givenRatings.Clear();
+        if (user != null)
+        {
+            foreach (var movie in allMovies)
+            {
+                var ratings = await Api.GetRatingsAsync(movie.Id);
+                var myRating = ratings.FirstOrDefault(r => r.UserId == user.Id);
+                if (myRating != null)
+                {
+                    givenRatings.Add((Movie: movie, Rating: myRating));
+                }
+            }
+        }
+    }
+
+    private async Task SaveUser()
+    {
+        if (user != null)
+        {
+            await Api.UpdateCurrentUserAsync(user);
+        }
+    }
+}
