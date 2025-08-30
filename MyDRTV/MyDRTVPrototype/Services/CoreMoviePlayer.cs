@@ -8,12 +8,6 @@ using MyDRTVPrototype.Models;
 
 namespace MyDRTVPrototype.Services
 {
-    /// <summary>
-    /// Simulates the "Core Movie Player" from your C4 diagram.  This service
-    /// loads data from a single JSON file on startup and exposes methods to
-    /// read and write movies, users, ratings, comments and watchlist entries.
-    /// Each write operation persists changes back to the JSON file.
-    /// </summary>
     public class CoreMoviePlayer
     {
         private const string DataFilePath = "Data/data.json";

@@ -2,9 +2,6 @@ using System;
 
 namespace MyDRTVPrototype.Models
 {
-    /// <summary>
-    /// Represents a comment left by a user on a movie.
-    /// </summary>
     public class Comment
     {
         public int Id { get; set; }

@@ -74,7 +74,6 @@ else
     {
         var allMovies = await Api.GetAllMoviesAsync();
 
-        // Fetch watchlist entries for each category
         var inProgressEntries = await Api.GetWatchlistAsync("InProgress");
         var watchedEntries = await Api.GetWatchlistAsync("Watched");
         var watchlistEntries = await Api.GetWatchlistAsync("Watchlist");
@@ -83,7 +82,6 @@ else
         watched    = allMovies.Where(m => watchedEntries.Any(e => e.MovieId == m.Id)).ToList();
         watchlist  = allMovies.Where(m => watchlistEntries.Any(e => e.MovieId == m.Id)).ToList();
 
-        // Recommendations: pick random movies not in any list
         var excludedIds = new HashSet<int>(inProgress.Select(m => m.Id)
             .Concat(watched.Select(m => m.Id))
             .Concat(watchlist.Select(m => m.Id)));

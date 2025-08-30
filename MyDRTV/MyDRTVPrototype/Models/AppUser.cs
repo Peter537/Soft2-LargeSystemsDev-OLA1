@@ -2,11 +2,6 @@ using System;
 
 namespace MyDRTVPrototype.Models
 {
-    /// <summary>
-    /// Represents an end user of the system.  The name AppUser is used to
-    /// avoid conflict with the built‑in User class and the page named User.  In
-    /// the JSON data file users are still stored under the "Users" array.
-    /// </summary>
     public class AppUser
     {
         public int Id { get; set; }

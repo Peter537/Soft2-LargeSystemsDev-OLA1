@@ -5,11 +5,6 @@ using MyDRTVPrototype.Models;
 
 namespace MyDRTVPrototype.Services
 {
-    /// <summary>
-    /// Acts as a facade for the pages to interact with the CoreMoviePlayer.  In
-    /// a real application this class would use HttpClient to call a REST API.
-    /// Here it simply delegates to the CoreMoviePlayer service registered in DI.
-    /// </summary>
     public class APICaller
     {
         private readonly CoreMoviePlayer _core;

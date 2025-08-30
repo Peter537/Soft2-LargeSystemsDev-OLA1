@@ -2,9 +2,6 @@ using System;
 
 namespace MyDRTVPrototype.Models
 {
-    /// <summary>
-    /// Represents a single film or TV programme.
-    /// </summary>
     public class Movie
     {
         public int Id { get; set; }
