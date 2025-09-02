@@ -29,14 +29,17 @@ MyDRTV implementerer en polyglot persistence tilgang med tre specialiserede data
 Arkitekturen viser MyDRTV-systemet som centralt hub med HTTPS API-forbindelser til hver database. PostgreSQL håndterer brugerdata med GDPR-fokus, MongoDB administrerer fleksible filmmetadata, mens AWS S3 leverer global videodistribution via CloudFront CDN.
 
 ### PostgreSQL til Brugerdata
+
 PostgreSQL blev strategisk valgt til brugerdatabasen grundet dens industrielt gennemprøvede ACID-compliance egenskaber og omfattende sikkerhedsfeature-suite, som er fundamentalt afgørende for stringent GDPR-overholdelse i europæiske sammenhænge. Databasens sofistikerede row-level security mekanismer og native krypteringsfunktioner beskytter sensitive personlige data som brugernavne, fødselsdatoer og adresseinformationer med military-grade sikkerhed.
 
 Samtidig sikrer PostgreSQLs robuste relationelle constraints system meticulous data-integritet på tværs af komplekse relationer mellem user ratings, film preferences og social interactions, hvilket garanterer konsistent dataqualitet under alle omstændigheder.
 
 ### MongoDB til Metadata
+
 MongoDB håndterer filmmetadata, da denne naturligt passer til dokumentstrukturer. Filmdata som cast-lister, undertekster og anmeldelser varierer i skemaer, hvilket MongoDBs fleksible document-model understøtter uden tidskrævende schema-migrations. Comments og ratings gemmes som embedded documents for optimeret læsehastighed.
 
 ### AWS S3 til Filmfiler
+
 AWS S3 leverer skalerbar, omkostningseffektiv storage med global distribution. Systemet udnytter forskellige storage classes, hvor populære film opbevares i Standard Storage for hurtig adgang, mens ældre indhold arkiveres billigere i Glacier Storage - kritisk for offentlige budgetbegrænsninger.
 
 ![AWS S3 Storage Strategy](./img/s3-storage-strategy.png)
@@ -56,6 +59,7 @@ Systemets defensive programming approach implementerer multi-layered datavalider
 Den teknologiske stack understøtter både vertikal og horisontal skalering gennem .NET 8s performance-forbedringer og native AOT compilation. Skaleringsstrategien omfatter database-replikering, partitionering og cloud-baseret auto-skalering, hvilket sikrer håndtering af stigende brugerantal og datamængder.
 
 ## TODO: Should we draw this or nah?
+
 ![Scaling Strategy](./img/scaling-strategy.png)
 
 ## Konklusion
