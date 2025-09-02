@@ -78,7 +78,7 @@ I container diagrammet for Internet Movie Player leverer Static Content (HTML, C
 
 ![alt text](./img/container-diagram-imp.png)
 
-Core Movie Players container diagram viser Backend (C#) som central komponent, der håndterer anmodninger fra Internet Movie Player. Backend validerer JWT via Authentication Service og læser/skriver til databaser:
+Core Movie Players container diagram viser Backend (C#) som central komponent, der håndterer anmodninger fra Internet Movie Player. Backend validerer JWT via Authentication Service og gennem C# moduler bliver der læst/skrevet til databaser:
 
 - Movie Database (AWS S3 for filmfiler)
 - Movie Metadata Database (MongoDB for kommentarer og info)
