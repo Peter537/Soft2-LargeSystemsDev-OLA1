@@ -10,6 +10,8 @@
 
 Vores prototype er lavet med C# og frameworket Blazor.
 
+Prototypen er et high-level proof of concept, der demonstrerer de grundlæggende funktioner i systemet.
+
 ## Præsentation
 
 Vores præsentation kan findes i [presentation.md](./presentation.md)
