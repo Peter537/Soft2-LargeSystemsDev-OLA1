@@ -1,78 +1,65 @@
 # Teknologi Afsnit
 
-MyDRTVs teknologivalg er baseret på behovet for at skabe en skalerbar, vedligeholdelsesvenlig og omkostningseffektiv løsning til den danske statslige broadcaster. Systemet skal håndtere høj tilgængelighed, brugerinteraktion og GDPR-overholdelse, mens det promoverer dansk TV og film globalt.
+MyDRTVs teknologivalg fokuserer på at skabe en skalerbar, vedligeholdelsesvenlig og omkostningseffektiv løsning for den danske statslige broadcaster. Systemet skal håndtere høj tilgængelighed, brugerinteraktion og GDPR-overholdelse, mens det promoverer dansk TV og film globalt.
 
-## Framework Valg: Blazor Server vs. Razor Pages
+## Framework Valg: Blazor Server
 
-Vi har valgt Blazor Server som vores primære frontend framework frem for traditionelle Razor Pages. Dette valg er strategisk begrundet i flere faktorer:
+Blazor Server er valgt som primært frontend framework, da det passer flere centrale behov samtidigt og tilbyder en sammenhængende udviklingsoplevelse. Ved at skrive både frontend og backend logik i C# elimineres behovet for separate JavaScript frameworks, hvilket reducerer kodekompleksitet og udviklingsomkostninger markant.
 
-Blazor Server giver os mulighed for at skrive både frontend og backend logik i C#, hvilket reducerer kodekompleksitet og udviklingsomkostninger betydeligt. I modsætning til Razor Pages, der kræver JavaScript til interaktive elementer, håndterer Blazor Server real-time opdateringer via SignalR-forbindelser. Dette er særligt værdifuldt for MyDRTVs sociale funktioner som comments og ratings, hvor brugere får øjeblikkelige opdateringer når andre interagerer med indhold.
+Det innovative ved Blazor Server ligger i håndteringen af realtidsopdateringer via SignalR-forbindelser, som etablerer persistente websocket-forbindelser mellem klient og server. Når brugere kommenterer eller giver ratings, propageres ændringer instantly til alle aktive sessioner, hvilket skaber en levende brugeroplevelse der matcher moderne streaming-platforme.
 
-Komplekse interactions som søgning, rating-opdateringer og watchlist-håndtering kan implementeres rent server-side uden JavaScript. Dette ses i MovieDetails.razor, hvor rating og comment-systemet fungerer seamless med data-binding og event-handling.
+Komplekse interaktioner som dynamisk søgning og intelligent watchlist-håndtering implementeres rent server-side uden JavaScript-afhængigheder. Dette demonstreres i `MovieDetails.razor` komponentet, hvor sofistikeret data-binding og event-handling skaber seamless brugerinteraktioner.
 
-Blazor Server reducerer udviklingstid, øger sikkerheden da business logic kører server-side, og muliggør real-time funktionalitet via SignalR. Ulempen er krav om konstant server-forbindelse og latency ved hver interaction, hvilket dog er acceptabelt for danske brugere.
-### cause i said so? xd måske den lige skal renskrives den her ^
+Denne "layered" tilgang øger både sikkerhed gennem server-side logik-ekskvering og udviklingseffektivitet via unified C# kodebasis, selvom kravet om konstant server-forbindelse introducerer minimal netværks-latency - dette menes dog at være acceptabelt for danske brugere med stabil internetinfrastruktur.
 
 ## Programmeringssprog: C# og .NET 8
 
-C# er valgt som primærsprog baseret på flere strategiske overvejelser. .NET 8 platformen giver enterprise-grade performance og sikkerhed, som er kritisk for en statslig broadcaster.
+C# og .NET 8 platformen blev strategisk valgt for deres enterprise-grade performance og avancerede sikkerhedsfeatures, hvilket er kritisk for en statslig broadcaster med høje krav til stabilitet. Teknologikombinationen leverer robust runtime-performance samtidig med moderne udviklingspraksis gennem omfattende tooling-økosystem.
 
-Dependency injection bruges til løs kobling mellem komponenter, hvilket understøtter testbarhed og fremtidig refaktorering. Modeller som AppUser, Movie og Comment udnytter C#s type-safety til at sikre data-integritet på compile-time. Async/await pattern anvendes konsekvent i services, hvilket sikrer skalerbarhed når systemet håndterer mange samtidige brugere.
+Systemarkitekturen anvender dependency injection til løs kobling mellem komponenter, hvilket letter unit testing og fremtidig refaktorering. Domænemodeller som AppUser, Movie og Comment udnytter C#s compile-time type-safety til at garantere data-integritet under udviklingsprocessen. Samtidig implementeres konsekvent async/await pattern gennem service-laget, hvilket sikrer optimal skalerbarhed under peak-belastning.
 
-### Hvorfor ikke .NET 9?
-Den er godt nok nyere, men har en standard support, mens at .NET 8 har en long-term support hvilket sikrer at vores produkt kan være så stabilt som muligt uden at kræve fremtidige opdateringer.
+.NET 8 blev bevidst prioriteret over nyere versioner grundet dens long-term support status, hvilket garanterer sikkerhedsopdateringer over en minimum 3-årig periode - strategisk vigtigt for offentlige projekter med langsigtede driftshorisonter.
 
 ## Database Strategi: Polyglot Persistence
 
-Vi implementerer en polyglot persistence tilgang med tre forskellige databaser, hver optimeret til specifikke use cases:
+MyDRTV implementerer en polyglot persistence tilgang med tre specialiserede databaser, hver optimeret til specifikke behov:
 
 ![Database Strategy Overview](./img/database-strategy.png)
 
-Figuren viser MyDRTVs database-arkitektur med tre specialiserede databaser. I centrum ses MyDRTV-systemet som et hub, hvorfra der går forbindelser til hver database via HTTPS API-kald. PostgreSQL håndterer user-data med fokus på GDPR-compliance og ACID-transaktioner. MongoDB administrerer fleksible metadata og kommentarer med dokument-baseret struktur. AWS S3 leverer global video-distribution med CloudFront CDN og omkostningsoptimeret storage.
+Arkitekturen viser MyDRTV-systemet som centralt hub med HTTPS API-forbindelser til hver database. PostgreSQL håndterer brugerdata med GDPR-fokus, MongoDB administrerer fleksible filmmetadata, mens AWS S3 leverer global videodistribution via CloudFront CDN.
 
 ### PostgreSQL til Brugerdata
-PostgreSQL er valgt til User Database på grund af ACID-compliance og robuste sikkerhedsfeatures, som er afgørende for GDPR-overholdelse. Brugerdata kræver stærk konsistens - når en bruger opdaterer sin profil, skal ændringer være atomic og durable.
+PostgreSQL blev strategisk valgt til brugerdatabasen grundet dens industrielt gennemprøvede ACID-compliance egenskaber og omfattende sikkerhedsfeature-suite, som er fundamentalt afgørende for stringent GDPR-overholdelse i europæiske sammenhænge. Databasens sofistikerede row-level security mekanismer og native krypteringsfunktioner beskytter sensitive personlige data som brugernavne, fødselsdatoer og adresseinformationer med military-grade sikkerhed.
 
-PostgreSQLs row-level security og indbyggede krypteringsmuligheder gør det ideelt til håndtering af personlige data som navne, fødselsdatoer og adresser. Relationelle constraints sikrer data-integritet på tværs af ratings og bruger-relationer.
+Samtidig sikrer PostgreSQLs robuste relationelle constraints system meticulous data-integritet på tværs af komplekse relationer mellem user ratings, film preferences og social interactions, hvilket garanterer konsistent dataqualitet under alle omstændigheder.
 
 ### MongoDB til Metadata
-MongoDB håndterer Movie Metadata Database, da filmmetadata naturligt passer til dokumentstrukturer. En film kan have variable felter som cast-lister, multiple sprog, undertekster og anmeldelser med forskellige skemaer.
-
-MongoDBs fleksible document-model gør det nemt at tilføje nye metadata-typer uden schema-migrations. Film-comments og ratings kan gemmes som embedded documents for hurtig læsning, hvilket optimerer user experience ved filmvisning.
-
-JSON-struktur i prototypen simulerer denne tilgang, hvor komplekse nested objects håndteres naturligt.
+MongoDB håndterer filmmetadata, da denne naturligt passer til dokumentstrukturer. Filmdata som cast-lister, undertekster og anmeldelser varierer i skemaer, hvilket MongoDBs fleksible document-model understøtter uden tidskrævende schema-migrations. Comments og ratings gemmes som embedded documents for optimeret læsehastighed.
 
 ### AWS S3 til Filmfiler
-AWS S3 er valgt til Movie Database (filmfilerne selv) da det giver skalerbar, omkostningseffektiv storage med global CDN-distribution. Danske film skal kunne streames til brugere på tværs af kontinenter med lav latency.
-
-S3s forskellige storage classes (Standard, Glacier) tillader os at optimere omkostninger - populære film opbevares i Standard for hurtig adgang, mens ældre indhold kan arkiveres billigere i Glacier. Dette er kritisk for en statslig organisation med budgetbegrænsninger.
+AWS S3 leverer skalerbar, omkostningseffektiv storage med global distribution. Systemet udnytter forskellige storage classes, hvor populære film opbevares i Standard Storage for hurtig adgang, mens ældre indhold arkiveres billigere i Glacier Storage - kritisk for offentlige budgetbegrænsninger.
 
 ![AWS S3 Storage Strategy](./img/s3-storage-strategy.png)
 
-Figuren viser AWS S3 storage-strategien for MyDRTV. Øverst ses S3-clouden, som indeholder to hovedbokse: Standard Storage til populære og nyligt udgivne film, og Glacier Storage til klassiske shows og arkivindhold. 
-
-- Standard Storage: Stærkest til film der ofte kaldes eller ses, eller nye udgivelser der forventes at være et hit.
-- Glacier storage: Bedst til ældre indhold der sjældent tilgås, men som stadig skal opbevares af juridiske eller historiske årsager, eller grundet tilbagevendende seere.
-
-Det handler om at sikrer tilgængelighed, mens vi prioriterer populære film lidt mere ift. hastighed. Diagrammet fremhæver hvordan systemet balancerer performance og omkostninger via S3s storage classes og global distribution.
+Diagrammet illustrerer storage-strategien med opdeling mellem Standard Storage for nyere udgivelser og Glacier Storage for arkivindhold. CloudFront CDN distribuerer globalt til edge locations som USA, London og Tyskland, hvilket balancerer performance og omkostninger effektivt.
 
 ## Sikkerhed og Performance
 
-Blazor Servers server-side model giver inherent sikkerhed da business logic aldrig eksponeres til klienten. Authentication håndteres via FakeAuthService i prototypen, men vil udvides til JWT-tokens med claims-based authorization.
+Blazor Servers inherente server-side arkitektur etablerer et robust sikkerhedslag ved at holde kritisk forretningslogik og sensitive algoritmer fuldstændig isoleret fra klient-miljøet. Denne tilgang eliminerer potentielle vector attacks og code inspection vulnerabilities, som typisk eksisterer i client-side JavaScript frameworks.
 
-APICaller.cs fungerer som facade mellem frontend og backend, hvilket implementerer separation of concerns og gør det nemt at tilføje authorization-lag og rate limiting fremover. Heraf gøres det tydeligt at vi bruger layered architecture for at adskille forskellige ansvarsområder.
+Mens den nuværende prototype anvender simplified FakeAuthService til demonstration, vil produktionsimplementeringen deploye industriel-standard JWT-tokens integreret med comprehensive claims-based authorization policies. APICaller.cs-komponenten fungerer strategisk som architectural facade mellem presentation og business lag, hvilket faciliterer seamless integration af avancerede sikkerhedsmekanismer som granular authorization matrices og intelligent rate limiting algoritmer.
 
-Data-validering sker både client-side via Blazors InputText og InputDate komponenter og server-side i CoreMoviePlayer, hvilket sikrer robust data-integritet.
+Systemets defensive programming approach implementerer multi-layered datavalidering gennem både client-side Blazor input komponenter og server-side validation i CoreMoviePlayer servicelaget, hvilket etablerer redundant data-integritet checkpoints gennem hele request-response lifecycle.
 
 ## Skalering og Fremtidige Overvejelser
 
-Vores teknologiske stack understøtter både vertikal og horisontal skalering. .NET 8s performance-forbedringer og native AOT compilation kan reducere memory footprint når trafikken stiger.
+Den teknologiske stack understøtter både vertikal og horisontal skalering gennem .NET 8s performance-forbedringer og native AOT compilation. Skaleringsstrategien omfatter database-replikering, partitionering og cloud-baseret auto-skalering, hvilket sikrer håndtering af stigende brugerantal og datamængder.
 
-Skaleringsstrategien for MyDRTV kan illustreres med et simpelt diagram, der viser systemets evne til at håndtere flere brugere og større datamængder gennem database-replikering, partitionering og cloud-baseret auto-skalering.
-### But do we do this?? or too much?
+## TODO: Should we draw this or nah?
+![Scaling Strategy](./img/scaling-strategy.png)
 
 ## Konklusion
 
-Vores teknologivalg balancerer udviklingshastighed, omkostningseffektivitet og fremtidig skalerbarhed. Blazor Server reducerer udviklerkompleksitet samtidig med at enterprise-grade sikkerhed opretholdes. Den polyglotte database-tilgang optimerer hver data-type individuelt, og C# som primærsprog sikrer vedligeholdelig, type-safe kode.
+Teknologivalgene balancerer udviklingshastighed, omkostningseffektivitet og fremtidig skalerbarhed. Blazor Server minimerer udviklerkompleksitet mens enterprise-grade sikkerhed opretholdes. Den polyglotte database-tilgang optimerer hver datatype individuelt, og C# som primærsprog sikrer vedligeholdelig, type-safe kode.
 
-Denne stack understøtter MyDRTVs mission om at promovere dansk indhold globalt ved at levere en moderne, responsiv og sikker streaming-platform der kan konkurrere med kommercielle alternativer.
+Denne stack understøtter MyDRTVs mission om global promotion af dansk indhold ved at levere en moderne, responsiv og sikker streaming-platform konkurrencedygtig med kommercielle alternativer.
