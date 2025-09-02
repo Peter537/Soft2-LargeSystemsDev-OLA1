@@ -88,14 +88,6 @@ Dette følger Domain-Driven Design med bounded contexts, hvor hver database mapp
 
 ![alt text](./img/container-diagram-cmp.png)
 
-I komponentdiagrammet for UI + Backend i Internet Movie Player består systemet af sider som Main Page, All Movies Page, Movie Page og User Page (alle C# Blazor-komponenter), der bruger APICaller til at kalde Core Movie Player. APICaller håndterer API-kald og sikrer, at data som filmratings hentes sikkert. Autentificering integreres via login-flow, der henter JWT.
-
-![alt text](./img/component-diagram-imp.png)
-
-For Backend i Core Movie Player håndterer APIHandler anmodninger og validerer via Authentication Service. Den bruger database forbindelses klasser til at hente data fra de respektive databaser og returnere svar. Dette sikrer høj tilgængelighed ved at isolere fejl og understøtte skalering af databaser individuelt.
-
-![alt text](./img/component-diagram-cmp.png)
-
 Samlet set flyder systemet sådan: Forbrugeren logger ind via Internet Movie Player, der autentificerer og henter JWT. Derefter foretages API-kald til Core Movie Player, der validerer og leverer data fra databaser. Dette understøtter features som søgning, ratings og anbefalinger, mens GDPR sikres via sikker datahåndtering i User Database.
 
 ## Arkitekturvalg og Refleksion
